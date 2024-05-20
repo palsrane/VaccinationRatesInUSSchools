@@ -15,14 +15,15 @@ Pallavi Rane
   - [1.2 Correcting longitudes](#section_1_2)  
 - [2. Data Review](sSection_1_2)  
   Review the data for missing values.
-  - [Section 2.1](#section_2_1)  
+  - [2.1 Checking for missing values](#section_2_1)  
 - [3. Data Transformation](#chapter2)  
   Modifying the data to look at state-wise statistics
-  - [Section 3.1](#section_3_1)
+  - [3.1 Summarizing the data by state](#section_3_1)  
+- [4. Acknoledgements](#chapter4)
 
 <figure>
 <img
-src="C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/USSchoolsImmunizationTableau.png"
+src="C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/USSchoolsImmunizationTableau.png"
 alt="Tableau generated image of statewise analysis" />
 <figcaption aria-hidden="true">Tableau generated image of statewise
 analysis</figcaption>
@@ -104,7 +105,7 @@ The cleaning process produces a .csv file with followig columns:
 
 The initial cleaning code from
 [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md)
-had to be modified because
+had to be modified because :
 
 - It was resulting in an error, possibly because the page where [the
   list of URLs for individual
@@ -116,6 +117,8 @@ had to be modified because
   and if one state had multiple schools with the same name, that was
   leading to a many to many matching, resulting in a cartesian matching
   and duplication.)
+
+### 1.1 Additing geolocation <a class="anchor"  id="section_1_1"></a>
 
 ``` r
 # url_wsj <- "https://raw.githubusercontent.com/WSJ/measles-data/master/all-measles-rates.csv"
@@ -158,10 +161,10 @@ Hence added as many parameters that could have been added out of
 “state”, “name”, “district”, “county”, “city” for each state
 
 ``` r
-# clean_states <- all_states %>% 
-#   map(~select(., tidyselect::any_of(c("state", "name", "district", "county", "city", "lat","lng")))) %>% 
-#   map(~mutate_at(., vars(lat, lng), as.numeric)) %>% 
-#   bind_rows() %>% 
+# clean_states <- all_states %>%
+#   map(~select(., tidyselect::any_of(c("state", "name", "district", "county", "city", "lat","lng")))) %>%
+#   map(~mutate_at(., vars(lat, lng), as.numeric)) %>%
+#   bind_rows() %>%
 #   filter(!is.na(lat))
 # 
 # wsj1 <- wsj %>% 
@@ -181,28 +184,49 @@ You can save the dataset as
 #write_csv(select(wsj1,-"new_id"),"measles_nonduplicated.csv")
 ```
 
+### 1.2 Correcting incorrect longitudes <a class="anchor"  id="section_1_2"></a>
+
 Looking at the data on Tableau revealed another problem with the data.
 86 of the records, 3 from Florida and 83 from Vermont, had incorrect
 longitudes,  
 ![Some schools were getting mapped outside
-US](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/IncorrectLongitudeInMeaslesDataset.gif)  
+US](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/IncorrectLongitudeInMeaslesDataset.gif)  
+Upon checking with google maps, it was clear that in some cases the
+longitudes were marked as +ve where should have been -ve,
+
+``` r
+# tmp=wsj1[wsj1$lng>0,]
+# tmp[!is.na(tmp$name),]
+# rm(tmp)
+```
+
 and this problem persisted in the source files where the latitudes and
 longitudes were taken from.
 
-Upon checking with google maps, it was clear that in some cases the
-longitudes were marked as +ve where should have been -ve. However, in
-most coases, it looked like the lattitudes were incorrectly entered as
-longitudes. Since it was not possible to correct each and every case
-manually, it was decided that for these 86 cases, the incorrect
-longitudes would be replaced with generated longitudes usually assigned
-to the respective state by Tableau. Tableau assigns -72.7678 to Vermont
-and -81.55 to Florida.
+``` r
+# clean_states[clean_states$lng>0,]
+```
+
+However, in most cases, it looked like the lattitudes were incorrectly
+entered as longitudes. Since it was not possible to correct each and
+every case manually, it was decided that for these 86 cases, the
+incorrect longitudes would be replaced with generated longitudes usually
+assigned to the respective state by Tableau. Tableau assigns -72.7678 to
+Vermont and -81.55 to Florida.
+
+``` r
+# wsj1$lng[(wsj1$state=="Vermont" & wsj1$lng>0)]= -72.7678
+# wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>80)]= -1* wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>0)]
+# wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>0)]= -81.55
+# 
+# write_csv(select(wsj1,-"new_id"),"measles_nonduplicated_ModifiedIncorrectLng.csv")
+```
 
 ## 2. Data review :<a class="anchor"  id="chapter2"></a>
 
 ``` r
 #Read your locally saved file
-vacc_rec=read_csv("measles_nonduplicated.csv")
+vacc_rec=read_csv("measles_nonduplicated_ModifiedIncorrectLng.csv")
 ```
 
     ## Rows: 46410 Columns: 16
@@ -213,6 +237,8 @@ vacc_rec=read_csv("measles_nonduplicated.csv")
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+### 2.1 Checking for missing values <a class="anchor"  id="section_2_1"></a>
 
 ##### Checking for any NAs in mmr and overall column
 
@@ -242,7 +268,7 @@ ggplot(data = vacc_rec) +
 
 ![Figure1: Scatter of the full dataset <br>-1 represents lack of report
 from
-school](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-10-1.png)
+school](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-12-1.png)
 <br><br>
 
 #### 26234 or 56.53 % of the schools reported overall vaccination rates.
@@ -255,7 +281,7 @@ ggplot(data=vacc_rec[vacc_rec$overall!=-1,],aes(y=overall))+
   labs(title='Number of Schools vs % of students with overall vaccination', x='Number of schools',y='Overall Vaccination (%)')
 ```
 
-![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 <br>
 
 #### 28323 or 61.03 % of the schools reported their MMR vaccination rates.
@@ -268,7 +294,7 @@ ggplot(data=vacc_rec[vacc_rec$mmr!=-1,], aes(y=mmr)) +
   labs(title='Number of Schools vs % of students with MMR vaccination', x='Number of schools',y='MMR Vaccination (%)')
 ```
 
-![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 <br><br>
 
 #### 12252 or 26.4 % of the schools reported both vaccination rates.
@@ -280,7 +306,7 @@ ggplot() +
   labs(title="Schools that reported both vaccination rates", y="MMR and Overall Vaccination Rates", x='Number of schools')
 ```
 
-![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 ggplot(data = vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,]) +
@@ -288,11 +314,11 @@ ggplot(data = vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,]) +
       labs(Title='MMR vs Overall vaccination percentages', x= 'Overall Vaccination (%)', y='mmr vaccination (%)')
 ```
 
-![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ## 3. Data transformation :<a class="anchor"  id="chapter3"></a>
 
-#### Creating a temporary table to run the summarize function on
+### 3.1 Summarizing the data by state <a class="anchor"  id="section3_1"></a>
 
 ``` r
 tmpdata=vacc_rec[vacc_rec$overall!=-1 | vacc_rec$mmr!=-1,]
@@ -349,11 +375,11 @@ ggplot(data=School_cnt_bar_data) +
   scale_fill_manual(values=c("mmr"="darkgreen","overall" = "blue"))
 ```
 
-![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](measles_immunization_exploration_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ### 4. Acknowledgements :<a class="anchor"  id="chapter4"></a>
 
-This data originally comes from
+This data comes from
 [\#tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md)
 and is originally from [The Wallstreet
 Journal](https://github.com/WSJ/measles-data). They recently published

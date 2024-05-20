@@ -28,9 +28,6 @@ The cleaning process produces a .csv file with followig columns:
 |lat      |double    | Lattitude  |
 |lng      |double    | Longitude  |
 
-## 1. Data Cleanup :<a class="anchor"  id="chapter1"></a>  
-  
-#### Following code adds latitude and longitude to the dataset.
 The initial cleaning code from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) had to be modified because   
   
  * It was resulting in an error, possibly because the page where [the list of URLs for individual states](https://github.com/WSJ/measles-data/tree/master/individual-states) was coming from has changed since the code was published.  
