@@ -15,8 +15,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Table of Contents  
   
 * [1. Data Cleaning](#chapter1)  
-Where to find the data and how to clean it with updated code to avoid duplication and correctly match geopintes to the correct record  
-    * [Section 1.1](#section_1_1)
+Data acquisition and clean up with updated code to avoid duplication
+    * [1.1 Additing geolocation](#section_1_1)  
+    * [1.2 Correcting longitudes](#section_1_2)      
 * [2. Data Review](sSection_1_2)  
 Review the data for missing values.  
     * [Section 2.1](#section_2_1)  
@@ -64,7 +65,7 @@ The cleaning process produces a .csv file with followig columns:
 |lat      |double    | Lattitude  |
 |lng      |double    | Longitude  |
 
-## 1. Data Cleanup :  <a class="anchor"  id="chapter1"></a>  
+## 1. Data Cleanup :<a class="anchor"  id="chapter1"></a>  
   
 #### Following code adds latitude and longitude to the dataset.
 The initial cleaning code from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) had to be modified because   
@@ -138,7 +139,7 @@ for these 86 cases, the incorrect longitudes would be replaced with generated lo
 usually assigned to the respective state by Tableau.
 Tableau assigns -72.7678 to Vermont and -81.55 to Florida.
 
-## 2. Data review :  
+## 2. Data review :<a class="anchor"  id="chapter2"></a>  
 ````{r}
 #Read your locally saved file
 vacc_rec=read_csv("measles_nonduplicated.csv")
@@ -197,7 +198,7 @@ ggplot(data = vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,]) +
       labs(Title='MMR vs Overall vaccination percentages', x= 'Overall Vaccination (%)', y='mmr vaccination (%)')
 ````
 
-### Data transformation :   
+## 3. Data transformation :<a class="anchor"  id="chapter3"></a>  
 #### Creating a temporary table to run the summarize function on  
 ````{r}
 tmpdata=vacc_rec[vacc_rec$overall!=-1 | vacc_rec$mmr!=-1,]
@@ -247,5 +248,5 @@ ggplot(data=School_cnt_bar_data) +
 ````
 
 
-### 4. Acknowledgements :  
+### 4. Acknowledgements :<a class="anchor"  id="chapter4"></a>   
 This data originally comes from [#tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) and is originally from [The Wallstreet Journal](https://github.com/WSJ/measles-data). They recently published an [article](https://www.wsj.com/graphics/school-measles-rate-map/) around 46,412 schools across 32 US States. 
