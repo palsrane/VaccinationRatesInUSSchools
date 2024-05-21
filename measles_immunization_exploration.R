@@ -77,32 +77,21 @@ wsj1=wsj1[!duplicated(wsj1$new_id),]
 write_csv(select(wsj1,-"new_id"),"measles_nonduplicated.csv")
 
 # Looking at the data on Tableau revealed another problem with the data. 86 of the records, 
-# 3 from Florida and 83 from Vermont had incorrect longitudes. 
+# 3 from Florida and 83 from Vermont had incorrect longitudes, and this problem persisted 
+# in the source files where the latitudes and longitudes were taken from. 
 # Upon checking with google maps, it was clear that in some cases the longitudes were marked
 # as +ve where should have been -ve. 
 
-tmp=wsj1[wsj1$lng>0,]
-tmp[!is.na(tmp$name),]
-rm(tmp)
-# However, in most cases, it looked like the lattitudes were incorrectly entered as longitudes, 
-# and this problen persisted in the original datasets where the latitudes and longitudes were taken from.
-# and this problem persisted in the source files where the latitudes and longitudes were taken from.
-
-clean_states[clean_states$lng>0,]
-
+# However, in most coases, it looked like the lattitudes were incorrectly entered as longitudes.
 # Since it was not possible to correct each and every case manually, it was decided that 
 # for these 86 cases, the incorrect longitudes would be replaced with generated longitudes 
 # usually assigned to the respective state by Tableau.
 # Tableau assigns -72.7678 to Vermont and -81.55 to Florida.
-wsj1$lng[(wsj1$state=="Vermont" & wsj1$lng>0)]= -72.7678
-wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>80)]= -1* wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>0)]
-wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>0)]= -81.55
 
-write_csv(select(wsj1,-"new_id"),"measles_nonduplicated_ModifiedIncorrectLng.csv")
 #----
 
 # Data review ----
-vacc_rec=read_csv("measles_nonduplicated_ModifiedIncorrectLng.csv")
+vacc_rec=read_csv("measles_nonduplicated.csv")
 
 ### Checking for any NAs in mmr and overall column
 length(vacc_rec$mmr[is.na(vacc_rec$mmr)])

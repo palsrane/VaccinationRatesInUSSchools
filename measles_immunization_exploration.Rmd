@@ -2,11 +2,11 @@
 title: "US SChools Measles Immunization Exploration"
 author: "Pallavi Rane"
 date: "2024-05-11"
-output: github_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo=TRUE)
 ```
 #### This R markdown explores the records of overall and MMR immunization from 46410 schools from 32 US states between 2017 and 2019.  
 
@@ -14,17 +14,16 @@ knitr::opts_chunk$set(echo = TRUE)
 <br>
 Table of Contents  
   
-* [1. Data Cleaning](#chapter1)  
-Data acquisition and clean up with updated code to avoid duplication
-    * [1.1 Additing geolocation](#section_1_1)  
-    * [1.2 Correcting longitudes](#section_1_2)      
-* [2. Data Review](sSection_1_2)  
-Review the data for missing values.  
-    * [2.1 Checking for missing values](#section_2_1)  
-* [3. Data Transformation](#chapter2)  
-Modifying the data to look at state-wise statistics  
-    * [3.1 Summarizing the data by state](#section_3_1)  
-* [4. Acknoledgements](#chapter4)
+* [1. Data Cleaning](chapter1) Data acquisition and clean up with updated code to avoid duplication  
+    * [1.1 Additing geolocation](section_1_1)  
+    * [1.2 Correcting longitudes](section_1_2)      
+* [2. Data Review](chapter2) Review the data for missing values   
+    * [2.1 Checking for missing values](section_2_1)  
+* [3. Data Transformation](chapter3) Modifying the data to look at state-wise statistics  
+    * [3.1 Summarizing the data by state](section_3_1)  
+  
+*  [4. Acknowledgements](chapter4)  
+  
   
 ![Tableau generated image of statewise analysis](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/USSchoolsImmunizationTableau.png)
 
@@ -37,7 +36,8 @@ library(pivottabler)
   
 `%notin%` <- Negate(`%in%`)  
 
-##If you are downloading the code and running it locally, set the working directory to where the dataset is located  
+##If you are downloading the code and running it locally, 
+#set the working directory to where the dataset is located  
 #setwd("C:/..../GoogleDataAnalyticsCapstoneProject")  
 
 ````  
@@ -73,7 +73,7 @@ The initial cleaning code from [tidytuesday](https://github.com/rfordatascience/
   
  * It was resulting in an error, possibly because the page where [the list of URLs for individual states](https://github.com/WSJ/measles-data/tree/master/individual-states) was coming from has changed since the code was published.  
 
- * When we were adding the latitude and longitude data from the states to the original vaccination file, it was being done only with school name and if one state had multiple schools with the same name, that was leading to a many to many matching, resulting in a cartesian matching and duplication.)  
+ * When we were adding the latitude and longitude data from the states to the original vaccination file, it was being done only with school name and if one state had multiple schools with the same name, that was leading to a many to many matching, resulting in a Cartesian matching and duplication.)  
    
 ### 1.1 Additing geolocation <a class="anchor"  id="section_1_1"></a>  
   
@@ -88,14 +88,19 @@ The initial cleaning code from [tidytuesday](https://github.com/rfordatascience/
 #   read_html() %>% 
 #   html_table() %>% 
 #   .[[1]] %>% 
-#   select(1) %>%  #changed select(Name) to select(1) becase there were three columns with headers 'Name'
+#   select(1) %>%  
+##changed select(Name) to select(1) becase there were three columns with headers 'Name'
 #   mutate(Name = str_remove(Name, "\\.csv")) %>% 
 #   filter(str_length(Name) > 3, str_length(Name) < 20) %>% 
 #   pull(Name)
 # 
-# raw_states=raw_states[2:32] # had to add this line of code because the first element on the list was "parent directory.."  and the last, 33rd element was "View all files"
+# # had to add this line of code because the first element on the list was 
+# #"parent directory.."  and the last, 33rd element was "View all files"
+# raw_states=raw_states[2:32] 
 # 
-# all_states <- glue::glue("https://raw.githubusercontent.com/WSJ/measles-data/master/individual-states/{raw_states}.csv") %>% 
+# all_states <- glue::glue(
+#  "https://raw.githubusercontent.com/WSJ/measles-data/master/individual-states/
+#      {raw_states}.csv") %>% 
 #   map(read_csv)
 ````
 As it turns out, not every state had city, county, and district information included in the individual datasets. Hence in the original code was matching based on just the name of the school and state. This was leading to cross matching in states where multiple schools with same name were present
@@ -112,7 +117,8 @@ Hence added as many parameters that could have been added out of "state", "name"
 
 ````{r}
 # clean_states <- all_states %>%
-#   map(~select(., tidyselect::any_of(c("state", "name", "district", "county", "city", "lat","lng")))) %>%
+#   map(~select(., tidyselect::
+#                 any_of(c("state", "name", "district", "county", "city", "lat","lng")))) %>%
 #   map(~mutate_at(., vars(lat, lng), as.numeric)) %>%
 #   bind_rows() %>%
 #   filter(!is.na(lat))
@@ -122,7 +128,8 @@ Hence added as many parameters that could have been added out of "state", "name"
 ````
 Creating a new identifier to remove duplications  
 ````{r}
-#wsj1=mutate(wsj1,new_id=paste0(state,year,name,type,city,county,district,enroll,mmr,overall,xrel,xmed,xper)) 
+#wsj1=mutate(wsj1,new_id=paste0(state,year,name,type,city,county,district,enroll,
+#                               mmr,overall,xrel,xmed,xper)) 
 #wsj1=wsj1[!duplicated(wsj1$new_id),]
 ````
 You can save the dataset as
@@ -131,7 +138,7 @@ You can save the dataset as
 ````
 ### 1.2 Correcting incorrect longitudes <a class="anchor"  id="section_1_2"></a>  
 Looking at the data on Tableau revealed another problem with the data. 86 of the records, 3 from Florida and 83 from Vermont, had incorrect longitudes,   
-![Some schools were getting mapped outside US](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/IncorrectLongitudeInMeaslesDataset.gif)  
+![Some schools were getting mapped outside US](IncorrectLatitudeAndLongitudeSeenOnTableau_1.png)
 Upon checking with google maps, it was clear that in some cases the longitudes were marked as +ve where should have been -ve,  
 ````{r}
 # tmp=wsj1[wsj1$lng>0,]
@@ -164,30 +171,33 @@ vacc_rec=read_csv("measles_nonduplicated_ModifiedIncorrectLng.csv")
 ### 2.1 Checking for missing values <a class="anchor"  id="section_2_1"></a>
   
 ##### Checking for any NAs in mmr and overall column  
-
+  
 ````{r}
 length(vacc_rec$mmr[is.na(vacc_rec$mmr)])
 length(vacc_rec$overall[is.na(vacc_rec$overall)])
 ````
-#### Lack of report from a school is represented as -1 in this dataset.
-
+#### Lack of report from a school is represented as -1 in this dataset.  
+  
 #### `r length(vacc_rec$overall[vacc_rec$overall==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report overall vaccination rates.  
     
-#### `r length(vacc_rec$mmr[vacc_rec$mmr==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report mmr vaccination rates.
-````{r fig.cap='Figure1: Scatter of the full dataset <br>-1 represents lack of report from school'}
+#### `r length(vacc_rec$mmr[vacc_rec$mmr==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report mmr vaccination rates.  
+  
+````{r, fig.align='left'}
 ggplot(data = vacc_rec) +
   geom_point(mapping = aes(x = overall, y = mmr, color=state)) +
   labs(x=('Overall vaccination rate (%)'),y='MMR vaccination rate (%)')
 ````
-<br><br>  
+   
   
 #### `r length(vacc_rec$overall[vacc_rec$overall!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported overall vaccination rates.  
 
-#### `r paste(as.character(round(count(vacc_rec[vacc_rec$overall>=80,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools that reported overall vaccinations had 80% or more of the kids vaccinated and <br>Only `r paste(as.character(round(count(vacc_rec[vacc_rec$overall<50 & vacc_rec$overall!=-1,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools had overall vaccinataion rate under 50%. 
-````{r }
+#### `r paste(as.character(round(count(vacc_rec[vacc_rec$overall>=80,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools that reported overall vaccinations had 80% or more of the kids vaccinated and <br>Only `r paste(as.character(round(count(vacc_rec[vacc_rec$overall<50 & vacc_rec$overall!=-1,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools had overall vaccinataion rate under 50%.  
+  
+````{r, fig.align='left'}
 ggplot(data=vacc_rec[vacc_rec$overall!=-1,],aes(y=overall))+
   geom_histogram(binwidth=1,color="blue",alpha=0.5) +
-  labs(title='Number of Schools vs % of students with overall vaccination', x='Number of schools',y='Overall Vaccination (%)')
+  labs(title='Number of Schools vs % of students with overall vaccination', 
+       x='Number of schools',y='Overall Vaccination (%)')
 ````
 <br>
 
@@ -195,25 +205,31 @@ ggplot(data=vacc_rec[vacc_rec$overall!=-1,],aes(y=overall))+
   
 #### `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr>=80,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools that reported mmr vaccinations had 80% or more of the kids vaccinated and <br>only `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr<50 & vacc_rec$mmr!=-1,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools had vaccinataion rate under 50%.  
 
-````{r }
+````{r, fig.align='left'}
 ggplot(data=vacc_rec[vacc_rec$mmr!=-1,], aes(y=mmr)) +
   geom_histogram(binwidth=1, color="darkgreen",alpha=0.5)+
-  labs(title='Number of Schools vs % of students with MMR vaccination', x='Number of schools',y='MMR Vaccination (%)')
+  labs(title='Number of Schools vs % of students with MMR vaccination', 
+       x='Number of schools',y='MMR Vaccination (%)')
 ````
 <br><br>
 
-#### `r length(vacc_rec$index[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported both vaccination rates. 
-````{r }
+#### `r length(vacc_rec$index[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported both vaccination rates.  
+  
+````{r, fig.align='left'}
 ggplot() +
-  geom_histogram(data=vacc_rec[vacc_rec$overall!=-1& vacc_rec$mmr!=-1,],aes(y=overall),binwidth=1,color="blue", alpha=0.5) +
-  geom_histogram(data=vacc_rec[vacc_rec$overall!=-1& vacc_rec$mmr!=-1,], aes(y=mmr),binwidth=1, color="darkgreen", alpha=0.5) +
-  labs(title="Schools that reported both vaccination rates", y="MMR and Overall Vaccination Rates", x='Number of schools')
+  geom_histogram(data=vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,],aes(y=overall),
+                 binwidth=1,color="blue", alpha=0.5) +
+  geom_histogram(data=vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,], aes(y=mmr),
+                 binwidth=1, color="darkgreen", alpha=0.5) +
+  labs(title="Schools that reported both vaccination rates", 
+       y="MMR and Overall Vaccination Rates", x='Number of schools')
 ````
-
-````{r }
+  
+````{r, fig.align='left'}
 ggplot(data = vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,]) +
        geom_point(mapping = aes(x = overall, y = mmr, color=state)) +
-      labs(Title='MMR vs Overall vaccination percentages', x= 'Overall Vaccination (%)', y='mmr vaccination (%)')
+      labs(Title='MMR vs Overall vaccination percentages', 
+           x= 'Overall Vaccination (%)', y='MMR vaccination (%)')
 ````
 
 ## 3. Data transformation :<a class="anchor"  id="chapter3"></a>  
@@ -224,7 +240,8 @@ tmpdata$overall[tmpdata$overall==-1]<-NA
 tmpdata$mmr[tmpdata$mmr==-1]<-NA
 tmpdata=mutate(tmpdata,
                mmr_count=ifelse(is.na(mmr),0,1),
-               overall_count=ifelse(is.na(overall),0,1)) #created separate columns in order to count number of schools with a given stat
+               overall_count=ifelse(is.na(overall),0,1)) 
+#created separate columns in order to count number of schools with a given stat
 
 #Creating the pivot table
 Summary_stats<- tmpdata %>% group_by(state) %>% 
@@ -255,12 +272,21 @@ Summary_stats<- tmpdata %>% group_by(state) %>%
 `r #write.csv(Summary_stats,"summary_stats_by_state.csv")` 
 
 ````{r}
-School_cnt_bar_data = as.data.frame(rbind(rename(mutate(Summary_stats[,c("state","schools_with_mmr")],Vaccination = "mmr"),"Num_of_schools"="schools_with_mmr"),
-      rename(mutate(Summary_stats[,c("state","schools_with_overall")],Vaccination = "overall"),"Num_of_schools"="schools_with_overall")))
-
+School_cnt_bar_data = 
+  as.data.frame(rbind(rename(mutate(Summary_stats[,c("state","schools_with_mmr")],
+                                    Vaccination = "mmr"),
+                             "Num_of_schools"="schools_with_mmr"),
+      rename(mutate(Summary_stats[,c("state","schools_with_overall")],
+                    Vaccination = "overall"),
+             "Num_of_schools"="schools_with_overall")))
+````
+  
+````{r, fig.align='left'}
 ggplot(data=School_cnt_bar_data) +
-  geom_bar(aes(x=state, y=Num_of_schools, fill=Vaccination), stat = "identity", position = "dodge", alpha=0.8) +
-  labs(title="Number of Schools with Overall & MMR vaccination reports by state", x="States") + 
+  geom_bar(aes(x=state, y=Num_of_schools, fill=Vaccination), 
+           stat = "identity", position = "dodge", alpha=0.8) +
+  labs(title="Number of Schools with Overall & MMR vaccination reports by state", 
+       x="States") + 
   theme(axis.text.x = element_text(angle = 90)) +
   scale_fill_manual(values=c("mmr"="darkgreen","overall" = "blue"))
 ````
