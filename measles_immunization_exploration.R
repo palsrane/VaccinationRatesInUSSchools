@@ -3,6 +3,7 @@ library(rvest)
 library(dplyr)
 library(ggplot2)
 library(pivottabler)
+library(ggpattern)
 
 `%notin%` <- Negate(`%in%`)
 
@@ -147,16 +148,28 @@ ggplot(data = vacc_rec[vacc_rec$mmr!=-1 & !is.na(vacc_rec$type),]) +
                              'Public' = 'deeppink'))+ 
   theme(axis.text.x = element_text(angle = 90))
 
-ggplot(data = vacc_rec[vacc_rec$mmr!=-1 & !is.na(vacc_rec$type),]) +
-  geom_point(mapping = aes(x = type, y = mmr, color=type)) +
+ggplot(data = vacc_rec[vacc_rec$mmr !=-1 & !is.na(vacc_rec$type),], aes(x=type, y=mmr)) + 
+  geom_boxplot(aes(fill=type))+
   labs(title='MMR Vaccination rates by type of school',x=('Type of school'),
        y='MMR vaccination rate (%)') +
-  scale_color_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                              'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                              'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+                             'Public' = 'deeppink'))+ 
   theme(axis.text.x = element_text(angle = 90))
 
+tmp = mutate(vacc_rec,mmr_stat= ifelse(mmr!=-1,1,-1))
+tmp$mmr_stat=factor(tmp$mmr_stat)
+tmp = tmp[!is.na(tmp$type),]
 
+ggplot(data = tmp) +
+  geom_bar(mapping = aes(x = type, fill= type ,alpha = mmr_stat), position="fill") +
+  labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
+       y='Schools reporting Overall vaccinations') +
+  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+                             'Public' = 'deeppink'))+ 
+  scale_alpha_manual(values = c("-1"=0.5,"1"=1))+
+  theme(axis.text.x = element_text(angle = 90))
 
 
 
@@ -176,11 +189,18 @@ paste(as.character(round(count(vacc_rec[vacc_rec$overall>=80,])/count(vacc_rec[v
 #Percentage of schools with <50% overall vacciation of those that reported
 paste(as.character(round(count(vacc_rec[vacc_rec$overall<50 & vacc_rec$overall!=-1,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")
 
-tmp = mutate(vacc_rec,overall_stat= ifelse(overall!=-1,1,-1))
-tmp = tmp[!is.na(tmp$type),]
+ggplot(data = vacc_rec[vacc_rec$overall !=-1 & !is.na(vacc_rec$type),], aes(x=type, y=overall)) + 
+  geom_boxplot(aes(fill=type))+
+  labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
+       y='Overall vaccination rate (%)') +
+  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+                             'Public' = 'deeppink'))+ 
+  theme(axis.text.x = element_text(angle = 90))
+
 ggplot() +
   geom_bar(data = vacc_rec[vacc_rec$overall!=-1 & !is.na(vacc_rec$type),],mapping = aes(x = type, fill=type)) +
-  #geom_bar(data = vacc_rec[!is.na(vacc_rec$type),],mapping = aes(x = type, fill=type,color = )) +
+  #geom_bar(data = vacc_rec[!is.na(vacc_rec$type),],mapping = aes(x = type, fill=type )) +
   labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
        y='Number of schools reporting Overall vaccinations') +
   scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
@@ -188,17 +208,20 @@ ggplot() +
                               'Public' = 'deeppink'))+ 
   theme(axis.text.x = element_text(angle = 90))
 
-ggplot(data = vacc_rec[vacc_rec$overall !=-1 & !is.na(vacc_rec$type),]) +
-  geom_point(mapping = aes(x = type, y = overall, color=type)) +
+tmp = mutate(vacc_rec,overall_stat= ifelse(overall!=-1,1,-1))
+tmp$overall_stat=factor(tmp$overall_stat)
+tmp = tmp[!is.na(tmp$type),]
+
+ggplot(data = tmp) +
+  geom_bar(mapping = aes(x = type, fill= type ,alpha = overall_stat), position="fill") +
   labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
-       y='Overall vaccination rate (%)') +
-  scale_color_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                              'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                              'Public' = 'deeppink'))+ 
+       y='Schools reporting Overall vaccinations') +
+  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+                             'Public' = 'deeppink'))+ 
+  scale_alpha_manual(values = c("-1"=0.5,"1"=1))+
   theme(axis.text.x = element_text(angle = 90))
-
-
-
+rm(tmp)
 
 ggplot() +
   geom_histogram(data=vacc_rec[vacc_rec$overall!=-1,],aes(x=overall),binwidth=1,color="blue", alpha=0.5) +
