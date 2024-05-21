@@ -176,22 +176,49 @@ vacc_rec=read_csv("measles_nonduplicated_ModifiedIncorrectLng.csv")
 length(vacc_rec$mmr[is.na(vacc_rec$mmr)])
 length(vacc_rec$overall[is.na(vacc_rec$overall)])
 ````
-#### Lack of report from a school is represented as -1 in this dataset.  
-  
-#### `r length(vacc_rec$overall[vacc_rec$overall==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report overall vaccination rates.  
-    
-#### `r length(vacc_rec$mmr[vacc_rec$mmr==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report mmr vaccination rates.  
-  
+### Lack of report from a school is represented as -1 in this dataset.  
+### `r length(vacc_rec$overall[vacc_rec$overall==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report overall vaccination rates.
+### `r length(vacc_rec$mmr[vacc_rec$mmr==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report mmr vaccination rates.   
+  <br>
 ````{r, fig.align='left'}
 ggplot(data = vacc_rec) +
   geom_point(mapping = aes(x = overall, y = mmr, color=state)) +
   labs(x=('Overall vaccination rate (%)'),y='MMR vaccination rate (%)')
 ````
-   
-  
-#### `r length(vacc_rec$overall[vacc_rec$overall!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported overall vaccination rates.  
 
-#### `r paste(as.character(round(count(vacc_rec[vacc_rec$overall>=80,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools that reported overall vaccinations had 80% or more of the kids vaccinated and <br>Only `r paste(as.character(round(count(vacc_rec[vacc_rec$overall<50 & vacc_rec$overall!=-1,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools had overall vaccinataion rate under 50%.  
+### `r length(vacc_rec$mmr[vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported MMR vaccination rates.  
+### `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr>=80,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools that reported MMR vaccinations had 80% or more of the kids vaccinated, and         
+### only `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr<50 & vacc_rec$mmr!=-1,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools had MMR vaccinataion rate under 50%.  
+  
+````{r, fig.align='left'}
+ggplot(data=vacc_rec[vacc_rec$mmr!=-1,],aes(y=mmr))+
+  geom_histogram(binwidth=1,color="darkgreen",alpha=0.5) +
+  labs(title='Number of Schools vs % of students with MMR vaccination', 
+       x='Number of schools',y='MMR Vaccination (%)')
+````
+
+````{r, fig.align='left'}
+ggplot(data = vacc_rec[vacc_rec$mmr!=-1 & !is.na(vacc_rec$type),]) +
+  geom_bar(mapping = aes(x = type, fill=type)) +
+  labs(title='MMR Vaccination reports by type of school',x=('Type of school'),
+       y='Number of schools reporting MMR') +
+  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+                              'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+                              'Public' = 'deeppink'))+ 
+  theme(axis.text.x = element_text(angle = 90))
+````   
+````{r, fig.align='left'}
+ggplot(data = vacc_rec[vacc_rec$mmr!=-1 & !is.na(vacc_rec$type),]) +
+  geom_point(mapping = aes(x = type, y = mmr, color=type)) +
+  labs(title='MMR Vaccination rates by type of school',x=('Type of school'),
+       y='MMR vaccination rate (%)') +
+  scale_color_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+  'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+  'Public' = 'deeppink'))+ 
+  theme(axis.text.x = element_text(angle = 90))
+````
+### `r length(vacc_rec$overall[vacc_rec$overall!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported overall vaccination rates.  
+### `r paste(as.character(round(count(vacc_rec[vacc_rec$overall>=80,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools that reported overall vaccinations had 80% or more of the kids vaccinated and <br>Only `r paste(as.character(round(count(vacc_rec[vacc_rec$overall<50 & vacc_rec$overall!=-1,])/count(vacc_rec[vacc_rec$overall!=-1,])*100,2)),"%")` of the schools had overall vaccinataion rate under 50%.  
   
 ````{r, fig.align='left'}
 ggplot(data=vacc_rec[vacc_rec$overall!=-1,],aes(y=overall))+
@@ -199,21 +226,28 @@ ggplot(data=vacc_rec[vacc_rec$overall!=-1,],aes(y=overall))+
   labs(title='Number of Schools vs % of students with overall vaccination', 
        x='Number of schools',y='Overall Vaccination (%)')
 ````
-<br>
-
-#### `r length(vacc_rec$mmr[vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported their MMR vaccination rates.  
-  
-#### `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr>=80,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools that reported mmr vaccinations had 80% or more of the kids vaccinated and <br>only `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr<50 & vacc_rec$mmr!=-1,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools had vaccinataion rate under 50%.  
+````{r, fig.align='left'}
+ggplot(data = vacc_rec[vacc_rec$overall!=-1 & !is.na(vacc_rec$type),]) +
+  geom_bar(mapping = aes(x = type, fill=type)) +
+  labs(title='Overall Vaccination reports by type of school',x=('Type of school'),
+       y='Number of schools reporting Overall vaccinations') +
+  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+                              'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+                              'Public' = 'deeppink'))+ 
+  theme(axis.text.x = element_text(angle = 90))
+````
 
 ````{r, fig.align='left'}
-ggplot(data=vacc_rec[vacc_rec$mmr!=-1,], aes(y=mmr)) +
-  geom_histogram(binwidth=1, color="darkgreen",alpha=0.5)+
-  labs(title='Number of Schools vs % of students with MMR vaccination', 
-       x='Number of schools',y='MMR Vaccination (%)')
+ggplot(data = vacc_rec[vacc_rec$overall !=-1 & !is.na(vacc_rec$type),]) +
+  geom_point(mapping = aes(x = type, y = overall, color=type)) +
+  labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
+       y='Overall vaccination rate (%)') +
+  scale_color_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
+  'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
+  'Public' = 'deeppink'))+ 
+  theme(axis.text.x = element_text(angle = 90))
 ````
-<br><br>
-
-#### `r length(vacc_rec$index[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported both vaccination rates.  
+### `r length(vacc_rec$index[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported both vaccination rates.  
   
 ````{r, fig.align='left'}
 ggplot() +
@@ -243,7 +277,7 @@ tmpdata=mutate(tmpdata,
                overall_count=ifelse(is.na(overall),0,1)) 
 #created separate columns in order to count number of schools with a given stat
 
-#Creating the pivot table
+#Creating the pivot table by state
 Summary_stats<- tmpdata %>% group_by(state) %>% 
   summarize(Total_schools = n(), 
             schools_with_mmr = sum(mmr_count), 
