@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo=TRUE)
 The aim of this study was to understand the vaccination reports from schools in 32 US states. 
 The questions we would try to answer are:  
   
-  1. How did the vaccination rates vary by states:
+  1. How did the vaccination rates vary by states?
   2. If the type of school affected the reported vaccination rates?
   3. Where can the future efforts be focused in order to bring better awareness of the vaccination benefits?  
   
@@ -52,7 +52,7 @@ library(ggpattern)
   
 Vaccination rates are for the 2017-18 school year for Colorado, Connecticut, Minnesota, Montana, New Jersey, New York, North Dakota, Pennsylvania, South Dakota, Utah and Washington. Rates for other states are 2018-19."  
   
-The cleaning process produces a .csv file with followig columns:  
+The cleaning process produces a .csv file with following columns:  
   
 |variable |class     |description |
 |:--------|:---------|:-----------|
@@ -73,7 +73,7 @@ The cleaning process produces a .csv file with followig columns:
 |lat      |double    | Lattitude  |
 |lng      |double    | Longitude  |
 
-## 1. Data Cleanup :<a class="anchor"  id="chapter1"></a>  
+## 1. Data Cleanup <a class="anchor"  id="chapter1"></a>  
   
 #### Following code adds latitude and longitude to the dataset.
 The initial cleaning code from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) had to be modified because :    
@@ -170,7 +170,7 @@ Tableau assigns -72.7678 to Vermont and -81.55 to Florida.
 ````
 
 
-## 2. Data review :<a class="anchor"  id="chapter2"></a>  
+## 2. Data review <a class="anchor"  id="chapter2"></a>  
 ````{r}
 #Read your locally saved file
 vacc_rec=read_csv("measles_nonduplicated_ModifiedIncorrectLng.csv")
@@ -310,7 +310,7 @@ ggplot(data = vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,]) +
            x= 'Overall Vaccination (%)', y='MMR vaccination (%)')
 ````
 
-## 3. Data transformation :<a class="anchor"  id="chapter3"></a>  
+## 3. Data transformation <a class="anchor"  id="chapter3"></a>  
 ### 3.1 Summarizing the data by state  <a class="anchor"  id="section3_1"></a>  
 ````{r}
 tmpdata=vacc_rec[vacc_rec$overall!=-1 | vacc_rec$mmr!=-1,]
@@ -384,5 +384,5 @@ ggplot(data=School_cnt_bar_data) +
 
 
 
-## 5. Acknowledgements :<a class="anchor"  id="chapter5"></a>   
+## 5. Acknowledgements <a class="anchor"  id="chapter5"></a>   
 This data comes from [#tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) and is originally from [The Wallstreet Journal](https://github.com/WSJ/measles-data). They recently published an [article](https://www.wsj.com/graphics/school-measles-rate-map/) around 46,412 schools across 32 US States. 
