@@ -21,8 +21,8 @@ Table of Contents
     * [2.1 Checking for missing values](section_2_1)  
 * [3. Data Transformation](chapter3) Modifying the data to look at state-wise statistics  
     * [3.1 Summarizing the data by state](section_3_1)  
-  
-*  [4. Acknowledgements](chapter4)  
+* [4. Insights and Future Steps](chapter4)  
+* [5. Acknowledgements](chapter5)  
   
   
 ![Tableau generated image of statewise analysis](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/USSchoolsImmunizationTableau.png)
@@ -149,7 +149,7 @@ and this problem persisted in the source files where the latitudes and longitude
 ````{r}
 # clean_states[clean_states$lng>0,]
 ````
-However, in most cases, it looked like the lattitudes were incorrectly entered as longitudes.
+However, in most cases, it looked like the latitudes were incorrectly entered as longitudes.
 Since it was not possible to correct each and every case manually, it was decided that
 for these 86 cases, the incorrect longitudes would be replaced with generated longitudes
 usually assigned to the respective state by Tableau.
@@ -290,7 +290,17 @@ ggplot(data=School_cnt_bar_data) +
   theme(axis.text.x = element_text(angle = 90)) +
   scale_fill_manual(values=c("mmr"="darkgreen","overall" = "blue"))
 ````
+## 4. Insights and Future Steps  <a class="anchor"  id="chapter4"></a>  
+ 
+* From this dataset it is apparant that the higher the vaccination rates are, the schools are more likely to report those rates.  
+
+* Only about 28,323 uot of 46,410 schools reported their vaccination records.  
+
+* Out of the 32 states, schools from only 17 states reported overall vaccination rates, and schoold from 21 states reported MMR vaccinations.  
+
+* Next step would be to look at reports of measles, mums and rubella rates in the 32 reported states in the academic year 2019-2020, and study effectiveness, or lack their of of these vaccinations.
 
 
-### 4. Acknowledgements :<a class="anchor"  id="chapter4"></a>   
+
+## 5. Acknowledgements :<a class="anchor"  id="chapter5"></a>   
 This data comes from [#tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) and is originally from [The Wallstreet Journal](https://github.com/WSJ/measles-data). They recently published an [article](https://www.wsj.com/graphics/school-measles-rate-map/) around 46,412 schools across 32 US States. 
