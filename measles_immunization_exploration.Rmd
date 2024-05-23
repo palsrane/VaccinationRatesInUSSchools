@@ -244,8 +244,8 @@ tmp = tmp[!is.na(tmp$type),]
 
 ggplot(data = tmp) +
   geom_bar(mapping = aes(x = type, fill= type ,alpha = mmr_stat), position="fill") +
-  labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
-       y='Schools reporting Overall vaccinations') +
+  labs(title='MMR Vaccination rates by type of school',x=('Type of school'),
+       y='Schools reporting MMR vaccinations') +
   scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
                              'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray', 
                              'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
