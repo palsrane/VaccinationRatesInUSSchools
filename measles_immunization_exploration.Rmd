@@ -16,8 +16,10 @@ The questions we would try to answer are:
   2. If the type of school affected the reported vaccination rates?
   3. Where can the future efforts be focused in order to bring better awareness of the vaccination benefits?  
   
-##### This notebook was built with R version `r getRversion()`  
-  
+##### This notebook was built with R version `r getRversion()`
+
+![MMR and Overall Vaccination Rated in US schoools](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/TableauDashboard2.png)
+
 ##### Table of Contents  
   
 * [1. Data Cleaning](chapter1) Data acquisition and clean up with updated code to avoid duplication  
@@ -31,9 +33,9 @@ The questions we would try to answer are:
 * [5. Acknowledgements](chapter5)  
   
   
-![Tableau generated image of statewise analysis](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/USSchoolsImmunizationTableau.png)
+![Statewise analysis](C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/USSchoolsImmunizationTableau_1.png)
 
-````{r}
+````{r, message = FALSE}
 library(tidyverse)  
 library(rvest)  
 library(dplyr)  
@@ -188,18 +190,27 @@ length(vacc_rec$overall[is.na(vacc_rec$overall)])
 ### `r length(vacc_rec$mmr[vacc_rec$mmr==-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr==-1,])/count(vacc_rec)*100,2)),"%")` of schools did not report mmr vaccination rates.   
   <br>
 ````{r, fig.align='left'}
-ggplot(data = vacc_rec) +
-  geom_point(mapping = aes(x = overall, y = mmr, color=state)) +
-  labs(x=('Overall vaccination rate (%)'),y='MMR vaccination rate (%)')
-````
+ggplot(data = vacc_rec) + 
+  geom_point(mapping = aes(x = overall, y = mmr, color=state, alpha=0.5)) +
+  labs(x=('Overall vaccination rate (%)'),y='MMR vaccination rate (%)') + 
+  scale_color_manual(values = c('black','forestgreen', 'red2', 'orange', 
+                                'cornflowerblue', 'magenta', 'darkolivegreen4', 
+                                'indianred1', 'tan4', 'darkblue', 'mediumorchid1',
+                                'firebrick4', 'yellowgreen', 'lightsalmon', "#661100",
+                                 "tan1",'darkgray', 'wheat4', '#DDAD4B', 'chartreuse', 
+                                 'seagreen1', 'moccasin', 'mediumvioletred', 'seagreen',
+                                'cadetblue1', '#999933', 'tan2' , 'tomato3', '#7CE3D8',
+                                'gainsboro','darkolivegreen','coral1','darkorange4'))
 
+````
+  
 ### `r length(vacc_rec$mmr[vacc_rec$mmr!=-1])` or `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr!=-1,])*100/count(vacc_rec),2)),'%')` of the schools reported MMR vaccination rates.  
 ### `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr>=80,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools that reported MMR vaccinations had 80% or more of the kids vaccinated, and         
 ### only `r paste(as.character(round(count(vacc_rec[vacc_rec$mmr<50 & vacc_rec$mmr!=-1,])/count(vacc_rec[vacc_rec$mmr!=-1,])*100,2)),"%")` of the schools had MMR vaccinataion rate under 50%.  
   
 ````{r, fig.align='left'}
 ggplot(data=vacc_rec[vacc_rec$mmr!=-1,],aes(y=mmr))+
-  geom_histogram(binwidth=1,color="darkgreen",alpha=0.5) +
+  geom_histogram(binwidth=1,fill="darkorange4",alpha=0.5, color='black') +
   labs(title='Number of Schools vs % of students with MMR vaccination', 
        x='Number of schools',y='MMR Vaccination (%)')
 ````
@@ -209,9 +220,9 @@ ggplot(data = vacc_rec[vacc_rec$mmr !=-1 & !is.na(vacc_rec$type),], aes(x=type, 
   geom_boxplot(aes(fill=type))+
   labs(title='MMR Vaccination rates by type of school',x=('Type of school'),
        y='MMR vaccination rate (%)') +
-  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                             'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray', 
+                             'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
   theme(axis.text.x = element_text(angle = 90))
 ````
 
@@ -220,9 +231,9 @@ ggplot(data = vacc_rec[vacc_rec$mmr!=-1 & !is.na(vacc_rec$type),]) +
   geom_bar(mapping = aes(x = type, fill=type)) +
   labs(title='MMR Vaccination reports by type of school',x=('Type of school'),
        y='Number of schools reporting MMR') +
-  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                              'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                              'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
+                              'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray', 
+                             'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
   theme(axis.text.x = element_text(angle = 90))
 ````   
 
@@ -235,9 +246,9 @@ ggplot(data = tmp) +
   geom_bar(mapping = aes(x = type, fill= type ,alpha = mmr_stat), position="fill") +
   labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
        y='Schools reporting Overall vaccinations') +
-  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                             'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray', 
+                             'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
   scale_alpha_manual(values = c("-1"=0.5,"1"=1))+
   theme(axis.text.x = element_text(angle = 90))
 ````
@@ -248,7 +259,7 @@ ggplot(data = tmp) +
   
 ````{r, fig.align='left'}
 ggplot(data=vacc_rec[vacc_rec$overall!=-1,],aes(y=overall))+
-  geom_histogram(binwidth=1,color="blue",alpha=0.5) +
+  geom_histogram(binwidth=1,fill="khaki",alpha=0.5, color='black') +
   labs(title='Number of Schools vs % of students with overall vaccination', 
        x='Number of schools',y='Overall Vaccination (%)')
 ````
@@ -258,9 +269,9 @@ ggplot(data = vacc_rec[vacc_rec$overall !=-1 & !is.na(vacc_rec$type),], aes(x=ty
   geom_boxplot(aes(fill=type))+
   labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
        y='Overall vaccination rate (%)') +
-  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                             'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray', 
+                             'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
   theme(axis.text.x = element_text(angle = 90))
 ````
 
@@ -269,9 +280,9 @@ ggplot(data = vacc_rec[vacc_rec$overall!=-1 & !is.na(vacc_rec$type),]) +
   geom_bar(mapping = aes(x = type, fill=type)) +
   labs(title='Overall Vaccination reports by type of school',x=('Type of school'),
        y='Number of schools reporting Overall vaccinations') +
-  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                              'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                              'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
+                              'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray',  
+                             'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
   theme(axis.text.x = element_text(angle = 90))
 ````
 
@@ -284,9 +295,9 @@ ggplot(data = tmp) +
   geom_bar(mapping = aes(x = type, fill= type ,alpha = overall_stat), position="fill") +
   labs(title='Overall Vaccination rates by type of school',x=('Type of school'),
        y='Number of schools reporting Overall vaccinations') +
-  scale_fill_manual(values=c('BOCES' =  'firebrick2', 'Charter' = 'goldenrod',
-                             'Kindergarten' = 'green3','Private' = 'blue', 'Nonpublic' = 'turquoise',
-                             'Public' = 'deeppink'))+ 
+  scale_fill_manual(values=c('BOCES' =  'coral4', 'Charter' = 'goldenrod',
+                             'Kindergarten' = 'darkolivegreen4','Private' = 'darkslategray', 
+                             'Nonpublic' = 'darkslategray3', 'Public' = 'coral'))+ 
   scale_alpha_manual(values = c("-1"=0.5,"1"=1))+
   theme(axis.text.x = element_text(angle = 90))
 ````
@@ -295,22 +306,30 @@ ggplot(data = tmp) +
   
 ````{r, fig.align='left'}
 ggplot() +
-  geom_histogram(data=vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,],aes(y=overall),
-                 binwidth=1,color="blue", alpha=0.5) +
   geom_histogram(data=vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,], aes(y=mmr),
-                 binwidth=1, color="darkgreen", alpha=0.5) +
+                 binwidth=1, fill="darkorange4", alpha=1, color='black') +
+  geom_histogram(data=vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,],aes(y=overall),
+                 binwidth=1,fill="khaki", alpha=0.75, color='black') +
   labs(title="Schools that reported both vaccination rates", 
-       y="MMR and Overall Vaccination Rates", x='Number of schools')
+       y="MMR and Overall Vaccination Rates", x='Number of schools') 
 ````
   
 ````{r, fig.align='left'}
 ggplot(data = vacc_rec[vacc_rec$overall!=-1 & vacc_rec$mmr!=-1,]) +
        geom_point(mapping = aes(x = overall, y = mmr, color=state)) +
       labs(Title='MMR vs Overall vaccination percentages', 
-           x= 'Overall Vaccination (%)', y='MMR vaccination (%)')
+           x= 'Overall Vaccination (%)', y='MMR vaccination (%)')+ 
+  scale_color_manual(values = c('black','forestgreen', 'red2', 'orange', 
+                                'cornflowerblue', 'magenta', 'darkolivegreen4', 
+                                'indianred1', 'tan4', 'darkblue', 'mediumorchid1',
+                                'firebrick4', 'yellowgreen', 'lightsalmon', "#661100",
+                                 "tan1",'darkgray', 'wheat4', '#DDAD4B', 'chartreuse', 
+                                 'seagreen1', 'moccasin', 'mediumvioletred', 'seagreen',
+                                'cadetblue1', '#999933', 'tan2' , 'tomato3', '#7CE3D8',
+                                'gainsboro','darkolivegreen','coral1','darkorange4'))
 ````
 
-## 3. Data transformation <a class="anchor"  id="chapter3"></a>  
+## 3. Data transformation :<a class="anchor"  id="chapter3"></a>  
 ### 3.1 Summarizing the data by state  <a class="anchor"  id="section3_1"></a>  
 ````{r}
 tmpdata=vacc_rec[vacc_rec$overall!=-1 | vacc_rec$mmr!=-1,]
@@ -361,12 +380,12 @@ School_cnt_bar_data =
   
 ````{r, fig.align='left'}
 ggplot(data=School_cnt_bar_data) +
-  geom_bar(aes(x=state, y=Num_of_schools, fill=Vaccination), 
-           stat = "identity", position = "dodge", alpha=0.8) +
+  geom_bar(aes(y=state, x=Num_of_schools, fill=Vaccination), 
+           stat = "identity", position = "dodge", color='black') +
   labs(title="Number of Schools with Overall & MMR vaccination reports by state", 
-       x="States") + 
-  theme(axis.text.x = element_text(angle = 90)) +
-  scale_fill_manual(values=c("mmr"="darkgreen","overall" = "blue"))
+       y="Number of schools", x="states") + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = 'top') +
+  scale_fill_manual(values=c("mmr"="darkorange4","overall" = "khaki"))
 ````
 ## 4. Insights and Future Steps  <a class="anchor"  id="chapter4"></a>  
  
@@ -385,4 +404,4 @@ ggplot(data=School_cnt_bar_data) +
 
 
 ## 5. Acknowledgements <a class="anchor"  id="chapter5"></a>   
-This data comes from [#tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) and is originally from [The Wallstreet Journal](https://github.com/WSJ/measles-data). They recently published an [article](https://www.wsj.com/graphics/school-measles-rate-map/) around 46,412 schools across 32 US States. 
+This data comes from [#tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-25/readme.md) and is originally from [The Wallstreet Journal](https://github.com/WSJ/measles-data). This dataset was recently published in their [article](https://www.wsj.com/graphics/school-measles-rate-map/) named "What's the Measles Vaccination Rate at Your Child's School?". 
