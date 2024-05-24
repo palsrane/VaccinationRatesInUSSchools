@@ -10,7 +10,7 @@ library(gridExtra)
 
 `%notin%` <- Negate(`%in%`)
 
-setwd("C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools")
+setwd("C:/Users/palla/Desktop/GoogleDataAnalyticsCapstoneProject/VaccinationRatesInUSSchools/Datasets")
 
 #Cleaning data----
 
@@ -100,11 +100,11 @@ wsj1$lng[(wsj1$state=="Vermont" & wsj1$lng>0)]= -72.7678
 wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>80)]= -1* wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>0)] 
 wsj1$lng[(wsj1$state=="Florida" & wsj1$lng>0)]= -81.55
 
-write_csv(select(wsj1,-"new_id"),"measles_nonduplicated_ModifiedIncorrectLng.csv")
+write_csv(select(wsj1,-"new_id"),"measles_nonduplicated_ModifiedcorrectLng.csv")
 #----
 
 # Data review ----
-vacc_rec=read_csv("measles_nonduplicated_ModifiedIncorrectLng.csv")
+vacc_rec=read_csv("measles_nonduplicated_ModifiedcorrectLng.csv")
 
 ### Checking for any NAs in mmr and overall column
 length(vacc_rec$mmr[is.na(vacc_rec$mmr)])
